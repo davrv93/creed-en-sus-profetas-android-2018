@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Creed En sus Profetas - Donacion 2018</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_v__lectura__bibli">V_LECTURA_BIBLIA</string>
+
+    <color name="fondo">#9A2EFE</color>
+
+    <string name="user">User</string>
+    <string name="password">Password</string>
+    <string name="title_activity_v__login">V_LOGIN</string>
+    <string name="title_activity_v__recuperar__password">V_RECUPERAR_PASSWORD</string>
+    <string name="resetpw">Reset Password</string>
+    <string name="cancel">CANCEL</string>
+    <string name="login">LOGIN</string>
+    <string name="continues">CONTINUE</string>
+    <string name="register">REGISTER</string>
+    <string name="forgot">FORGOT PASSWORD</string>
+    <string name="title_activity_v__conexion__extern">V_CONEXION_EXTERNA</string>
+    <string name="first_name">First_Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="country">Country</string>
+    <string name="city">City</string>
+    <string name="helpt0"> Before we Start... Did you Pray? </string>
+    <string name="helpt1">Touch two times for highlight the desired verse. Read all the chapter and then touch the "check" button to continue</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="dialog_text">Lecture: </string>
+    <string name="dialog_o1">BIBLE</string>
+    <string name="dialog_o2">EGW</string>
+    <string name="instruction_calendar">Click to read: </string>
+</resources>
