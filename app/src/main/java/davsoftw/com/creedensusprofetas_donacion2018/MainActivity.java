@@ -11,20 +11,14 @@ import android.view.MenuItem;
 
 import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_MAPEO;
+import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.ROUTER;
 
 public class MainActivity extends AppCompatActivity {
 
-    public C_MAPEO oMapeo;
+    public ROUTER oMapeo;
     public int language;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        oMapeo= new C_MAPEO();
+        oMapeo= new ROUTER();
 
         SharedPreferences prefs =
                 getSharedPreferences("MisPreferencias",Context.MODE_PRIVATE);

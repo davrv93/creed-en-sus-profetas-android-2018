@@ -1,36 +1,23 @@
 package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view;
 //import android.support.v7.app.ActionBarActivity;
-import java.security.acl.Owner;
-import java.util.ArrayList;
-import java.util.List;
 
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_MAPEO;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK_READ_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_CHAPTER_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_VERSE;
+import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.ROUTER;
 
 import davsoftw.com.creedensusprofetas_donacion2018.R;
 
 public class V_LECTURA_EGW extends Activity {
 
-	public C_MAPEO oMapeo;
+	public ROUTER oMapeo;
 	public String date;
 
 
@@ -38,7 +25,7 @@ public class V_LECTURA_EGW extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.lay_v_lectura);
-      oMapeo= new C_MAPEO();
+      oMapeo= new ROUTER();
       SharedPreferences prefs = getSharedPreferences("MisPreferencias",Context.MODE_PRIVATE);
       String language=prefs.getString("language","");
       //

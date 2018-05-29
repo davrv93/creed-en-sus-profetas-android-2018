@@ -1,4 +1,4 @@
-package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller;
+package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas;
 
 import davsoftw.com.creedensusprofetas_donacion2018.MainActivity;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view.*;
@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 
-public class C_MAPEO {
+public class ROUTER {
 
 
     public void mapping(Context context, int opcion, int language, String date)
@@ -27,11 +27,6 @@ public class C_MAPEO {
                 intent.putExtra("date",String.valueOf(date));
                 context.startActivity(intent);
                 break;
-
-
-            case 4:
-                C_LOGICA oLogica = new C_LOGICA();
-                //oLogica.Conectar(context);
 
             case 5:
                 intent = new Intent(context, V_CALENDAR.class);

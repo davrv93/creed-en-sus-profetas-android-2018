@@ -1,7 +1,5 @@
 package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -22,25 +20,17 @@ import android.view.View.OnTouchListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import davsoftw.com.creedensusprofetas_donacion2018.R;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_MAPEO;
+import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.ROUTER;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_VERSE;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_VERSE;
 
 public class V_LECTURA_BIBLIA extends Activity {
 
-    public C_MAPEO oMapeo;
+    public ROUTER oMapeo;
     public M_VERSE oVerse;
     public TextView[] myTextViews;
     public LinearLayout Layout;
