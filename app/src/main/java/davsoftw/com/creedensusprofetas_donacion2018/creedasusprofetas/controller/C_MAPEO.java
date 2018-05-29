@@ -5,10 +5,8 @@ package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controlle
 import java.util.ArrayList;
 import java.util.List;
 
-import com.davsoftw.creedasusprofetas.view.V_CALENDAR;
-import com.davsoftw.creedasusprofetas.view.V_LECTURA_BIBLIA;
-import com.davsoftw.creedasusprofetas.view.V_LECTURA_EGW;
-import com.davsoftw.creedasusprofetas.view.V_PRINCIPAL;
+import davsoftw.com.creedensusprofetas_donacion2018.MainActivity;
+import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view.*;
 import android.content.Context;
 import android.content.Intent;
 
@@ -27,7 +25,7 @@ public class C_MAPEO {
                 context.startActivity(intent);
                 break;
             case 2:
-                intent = new Intent(context, V_PRINCIPAL.class);
+                intent = new Intent(context, MainActivity.class);
                 context.startActivity(intent);
                 break;
             case 3:
@@ -39,7 +37,7 @@ public class C_MAPEO {
 
             case 4:
                 C_LOGICA oLogica = new C_LOGICA();
-                oLogica.Conectar(context);
+                //oLogica.Conectar(context);
 
             case 5:
                 intent = new Intent(context, V_CALENDAR.class);

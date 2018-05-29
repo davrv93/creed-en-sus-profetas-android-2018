@@ -33,6 +33,27 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        oMapeo= new C_MAPEO();
+
+        SharedPreferences prefs =
+                getSharedPreferences("MisPreferencias",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        String lang= Locale.getDefault().getLanguage();
+        language=2;
+        if(lang.compareTo("es")==0)
+        {
+            editor.putString("language", "1");
+            language=1;
+        }
+        if(lang.compareTo("en")==0)
+        {
+            editor.putString("language", "2");
+            language=2;
+        }
+        editor.commit();
+        System.out.println(lang+ "language:"+language +"xD");
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,25 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                oMapeo= new C_MAPEO();
-
-                SharedPreferences prefs =
-                        getSharedPreferences("MisPreferencias",Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                String lang= Locale.getDefault().getLanguage();
-                language=2;
-                if(lang.compareTo("es")==0)
-                {
-                    editor.putString("language", "1");
-                    language=1;
-                }
-                if(lang.compareTo("en")==0)
-                {
-                    editor.putString("language", "2");
-                    language=2;
-                }
-                editor.commit();
-                System.out.println(lang+ "language:"+language +"xD");
 
 
 

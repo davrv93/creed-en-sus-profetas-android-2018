@@ -50,19 +50,42 @@ public class V_LECTURA_BIBLIA extends Activity {
 		super.onCreate(savedInstanceState);
 		// Asignando vista
 		setContentView(R.layout.lay_v_lectura);
-		
-
 		oMapeo = new C_MAPEO();
 		SharedPreferences prefs = getSharedPreferences("MisPreferencias",
 				Context.MODE_PRIVATE);
 		String language = prefs.getString("language", "");
-
+		System.out.pritln("language"+language);
 		Intent myIntent = getIntent(); // gets the previously created intent
 		date = myIntent.getStringExtra("date");
+
+		// Instantiate the RequestQueue.
+		RequestQueue queue = Volley.newRequestQueue(this);
+		String url ="https://davrv93.pythonanywhere.com/api/believe/verse/reading/";
+
+		// Request a string response from the provided URL.
+		StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+				new Response.Listener<String>() {
+					@Override
+					public void onResponse(String response) {
+						// Display the first 500 characters of the response string.
+						mTextView.setText("Response is: "+ response.substring(0,500));
+					}
+				}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				mTextView.setText("That didn't work!");
+			}
+		});
+
+		// Add the request to the RequestQueue.
+		queue.add(stringRequest);
+
+
 
 		System.out.println("DATE: " + date);
 
 		LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.r_fila6);
+		/*
 		List<Object> Lista = oMapeo.mappingList(this, 1,
 				Integer.valueOf(language), date);
 		List<M_VERSE> aVerse = new ArrayList<M_VERSE>();
@@ -149,6 +172,7 @@ public class V_LECTURA_BIBLIA extends Activity {
 
 		// ImageView im = (ImageView) findViewById(R.id.btnCheck);
 		// im.setBackgroundColor(Color.parseColor("#000000"));
+		*/
 
 	}
 
