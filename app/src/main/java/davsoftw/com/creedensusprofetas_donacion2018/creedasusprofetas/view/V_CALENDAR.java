@@ -114,77 +114,10 @@ public class V_CALENDAR extends Activity {
 	private void setTitle(String today)
 	{
 		//String today = myIntent.getStringExtra("date");		
-		List<Object> Lista = oMapeo.mappingList(this, 1,
-				Integer.valueOf(language), today);
-		List<M_VERSE> aVerse = new ArrayList<M_VERSE>();
-		List<M_BOOK> aBook = new ArrayList<M_BOOK>();
 
-		aVerse = (List<M_VERSE>) Lista.get(2);
-		aBook = (List<M_BOOK>) Lista.get(1);
-
-		 
-		Titulo.setText(aBook.get(0).getName() + " "
-				+ aVerse.get(0).getChapter());
-		Titulo.setTypeface(null, Typeface.BOLD);
-		Titulo.setGravity(Gravity.CENTER);
-		if(Titulo.getText().length()>8)
-		{
-			Titulo.setTextSize(14);
-		}
-		else
-		{
-			Titulo.setTextSize(22);
-		}
-		Titulo.setTextColor(Color.WHITE);
-		Titulo.setBackgroundColor(Color.parseColor("#000000"));
 
 	}
 
-	@SuppressWarnings("unused")
-	private void openAlert(View view, final String date) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				V_CALENDAR.this);
-
-		alertDialogBuilder.setTitle(this.getTitle());
-		alertDialogBuilder.setMessage(getString(R.string.dialog_text) + " "
-				+ date);
-		// set positive button: Yes message
-		alertDialogBuilder.setPositiveButton(getString(R.string.dialog_o1),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// go to a new activity of the app
-						oMapeo = new C_MAPEO();
-						oMapeo.mapping(V_CALENDAR.this, 1, language, date);
-
-					}
-				});
-		// set negative button: No message
-		alertDialogBuilder.setNegativeButton(getString(R.string.dialog_o2),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						oMapeo = new C_MAPEO();
-						oMapeo.mapping(V_CALENDAR.this, 3, language, date);
-
-					}
-				});
-
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		// show alert
-		alertDialog.show();
-	}
-
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.btn_biblia:
-			oMapeo.mapping(this, 1, language, "");
-			break;
-		case R.id.btn_egw:
-			oMapeo.mapping(this, 3, language, "");
-			break;
-
-		}
-
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

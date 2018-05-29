@@ -2,6 +2,8 @@ package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,21 +15,18 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -36,12 +35,13 @@ import org.json.JSONObject;
 
 import davsoftw.com.creedensusprofetas_donacion2018.R;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_MAPEO;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK;
+import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_VERSE;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_VERSE;
 
 public class V_LECTURA_BIBLIA extends Activity {
 
     public C_MAPEO oMapeo;
+    public M_VERSE oVerse;
     public TextView[] myTextViews;
     public LinearLayout Layout;
     public String idbook;
@@ -58,46 +58,27 @@ public class V_LECTURA_BIBLIA extends Activity {
         super.onCreate(savedInstanceState);
         // Asignando vista
         setContentView(R.layout.lay_v_lectura);
-        oMapeo = new C_MAPEO();
         SharedPreferences prefs = getSharedPreferences("MisPreferencias",
                 Context.MODE_PRIVATE);
         String language = prefs.getString("language", "");
-        System.out.print("language" + language);
         Intent myIntent = getIntent(); // gets the previously created intent
-        date = myIntent.getStringExtra("date");
-
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String strDate = sdf.format(c.getTime());
-
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(this);
-        final TextView Titulo = new TextView(this);
-
-        final String url = "https://davrv93.pythonanywhere.com/api/believe/verse/reading/?date=" + strDate + "&language=ES";
 
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        try {
-                            jsonArray = response.getJSONArray("obj_reading");
-
-                            headerObject = response.getJSONObject("obj_header");
-
-                            int N = jsonArray.length();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final List<M_VERSE> aVerse = new C_VERSE(getApplicationContext()).execute().get();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int N = aVerse.size();
                             LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.r_fila6);
-
                             myTextViews = new TextView[N];
 
-                            try {
-                                Titulo.setText(headerObject.getString("book_name"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            final TextView Titulo = new TextView(getApplicationContext());
+                            Titulo.setText("Capitulo: "+aVerse.get(0).getChapter().toString());
+
                             Titulo.setTypeface(null, Typeface.BOLD);
                             Titulo.setGravity(Gravity.CENTER);
                             Titulo.setTextSize(24);
@@ -106,20 +87,19 @@ public class V_LECTURA_BIBLIA extends Activity {
 
                             myLinearLayout.addView(Titulo);
 
-
-                            for (int i = 0; i < jsonArray.length(); i++) {
+                            for (int i = 0; i < aVerse.size(); i++) {
                                 final TextView rowTextView = new TextView(getApplicationContext());
-                                JSONObject versiculo = jsonArray.getJSONObject(i);
+
                                 rowTextView.setTextSize(24);
-                                rowTextView.setText(versiculo.getString("verse") + " "
-                                        + versiculo.getString("data") + '\n');
+                                rowTextView.setText(aVerse.get(i).getVerse() + " "
+                                        + aVerse.get(i).getData() + '\n');
                                 rowTextView.setTextColor(Color.WHITE);
                                 rowTextView.setTypeface(null, Typeface.ITALIC);
                                 rowTextView.setId(i + 1);
                                 myLinearLayout.addView(rowTextView);
                                 rowTextView.setBackgroundColor(Color.parseColor("#000000"));
 
-                                if (versiculo.getString("highlight").compareTo("1") == 0) {
+                                if (aVerse.get(i).getHighlight().compareTo("1") == 0) {
                                     rowTextView.setBackgroundColor(Color.BLUE);
                                     System.out.println("blue");
                                 }
@@ -136,12 +116,10 @@ public class V_LECTURA_BIBLIA extends Activity {
 
                                                     if (colorId == Color.BLUE) {
                                                         rowTextView.setBackgroundColor(Color.BLACK);
-                                                        oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
-                                                                1, idbook, chapter, verse, "2");
+
                                                     } else {
                                                         rowTextView.setBackgroundColor(Color.BLUE);
-                                                        oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
-                                                                1, idbook, chapter, verse, "1");
+
                                                     }
 
                                                     return super.onDoubleTap(e);
@@ -159,32 +137,27 @@ public class V_LECTURA_BIBLIA extends Activity {
                                     @Override
                                     public boolean onTouch(View v, MotionEvent event) {
                                         gestureDetector.onTouchEvent(event);
-
                                         return true;
                                     }
                                 });
                                 myTextViews[i] = rowTextView;
-
-
                             }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-
-                    }
-                });
+                    });
 
 
-        // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
+                    System.out.println("aVErse"+aVerse.size());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+
+
+
 
     }
 

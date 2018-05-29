@@ -3,8 +3,10 @@ package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model;
 public class M_VERSE {
 	private String id;
     private String idbook;
+	private String book;
     private String chapter;
     private String verse;
+	private String data;
     private String text;
     private String language;
     private String highlight;
@@ -46,4 +48,20 @@ public class M_VERSE {
 	}
 	public String getId() { return id; }
 	public void setId(String id) { this.id = id; }
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public String getBook() {
+		return book;
+	}
+
+	public void setBook(String book) {
+		this.book = book;
+	}
 }

@@ -1,118 +1,162 @@
 
 package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller;
-import  davsoftw.com.creedensusprofetas_donacion2018.tools.DataBaseHelper;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BIBLE_READ;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_BOOK_READ_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_CHAPTER_EGW;
-import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_READING_PLAN;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_VERSE;
+
+import static com.android.volley.VolleyLog.TAG;
 
 public class C_LOGICA {
 
 
 
+    public JSONArray obj_reading;
+    public JSONObject obj_header;
+    public JSONObject obj_language;
+    public Dictionary retorno = new Hashtable();
+    public RequestQueue requestQueue;
+    public JSONObject result;
 
-
-    public void updateVerse(Context context, String idbook, String chapter, String verse, String highlight)
-    {
-        /*
-        String Query= "UPDATE verse SET highlight='"+highlight+"' where idbook="+idbook+" and chapter="+chapter+" and verse="+verse;
-        System.out.println(Query);
-        DataBaseHelper DbHelper = Conectar(context);
-        SQLiteDatabase db = DbHelper.getWritableDatabase();
-        db.execSQL(Query);*/
+    public interface VolleyCallback {
+        void onSuccess(JSONObject result);
     }
 
-    public List<Object> LecturaBiblia(Context context, String language, String date)
+    public void getString(final Context context, final VolleyCallback callback) {
+        RequestQueue queue = Volley.newRequestQueue(context);
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = sdf.format(c.getTime());
+        final String url = "https://davrv93.pythonanywhere.com/api/believe/verse/reading/?date=" + strDate + "&language=ES";
+        // Testing out blocking
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+    }
+
+
+
+    class ThreadA extends AsyncTask<Void, Void, JSONObject> {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = sdf.format(c.getTime());
+
+        final String url = "https://davrv93.pythonanywhere.com/api/believe/verse/reading/?date=" + strDate + "&language=ES";
+
+        public ThreadA() {
+        }
+
+        @Override
+        protected JSONObject doInBackground(Void... params) {
+            RequestFuture<JSONObject> future = RequestFuture.newFuture();
+            final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                    url,
+                    new JSONObject(),
+                    future, future);
+
+            requestQueue.add(request);
+
+            try {
+                JSONObject response=future.get(10, TimeUnit.SECONDS);
+                System.out.println("retorno"+response);
+                return  response;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    public JSONObject LecturaBiblia(final Context context)
     {
-        List<Object> Lista = new ArrayList<Object>();
-        /*List<M_BIBLE_READ> aBibleRead= new  ArrayList<M_BIBLE_READ>();
-        //List<C_MAPEO> oMapeo = new ArrayList<C_MAPEO>();
-        List<M_BOOK> aBook = new ArrayList<M_BOOK>();
-        List<M_VERSE> aVerse = new ArrayList<M_VERSE>();
-        date=date.trim();
-        M_BIBLE_READ oBibleRead = new M_BIBLE_READ();
-        M_BOOK oBook = new M_BOOK();
-        M_VERSE oVerse = new M_VERSE();
+        final List<M_VERSE> aVerse = new ArrayList<M_VERSE>();
+        requestQueue = Volley.newRequestQueue(context);
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("RT", "Thread t Begins");
+                ThreadA threadA = new ThreadA();
+                try{
+                    try {
 
-        List<Object> Lista = new ArrayList<Object>();
-        Cursor cursor;
-        if(date.compareTo("")==0)
-        {
-            date="now";
-            cursor=resultado(context, "SELECT l.idbook , l.name , l.abrev , v.idbook, v.chapter, v.verse, v.text, v.language, v.highlight FROM book l , verse v , bible_read br WHERE date('"+date+"', 'localtime') = br.START_DATE AND l.idbook = v.idbook AND l.idbook = br.idbook AND v.chapter = br.start_chapter and v.language=l.language and l.language="+language);
-        }
-        else
-        {
-            cursor=resultado(context, "SELECT l.idbook , l.name , l.abrev , v.idbook, v.chapter, v.verse, v.text, v.language, v.highlight FROM book l , verse v , bible_read br WHERE '"+date+"'" +
-                    " = br.START_DATE AND l.idbook = v.idbook AND l.idbook = br.idbook AND v.chapter = br.start_chapter and v.language=l.language and l.language="+language);
-        }
-        System.out.println("VALOR DE DATE EN LOGICA: " +date);
+                        try{
+                            result=threadA.execute().get(10, TimeUnit.SECONDS);
+                            System.out.println("EL VALOR DE RESULT" + result);
+                        }
+                        catch (TimeoutException e){
+                            Log.e(TAG,Log.getStackTraceString(e));
+                        }
+                    }
+                    catch (InterruptedException e){
+                        Log.e(TAG,Log.getStackTraceString(e));
+                    }
+                }
+                catch (ExecutionException e) {
+                    Log.e(TAG,Log.getStackTraceString(e));
+                }
 
-
-        //Cursor cursor=resultado(context, "SELECT l.idbook , l.name , l.abrev , v.idbook, v.chapter, v.verse, v.text, v.language, v.highlight FROM book l , verse v , bible_read br WHERE date('"+date+"', 'localtime') = br.START_DATE AND l.idbook = v.idbook AND l.idbook = br.idbook AND v.chapter = br.start_chapter and v.language=l.language and l.language="+language);
-
-        int filas= cursor.getCount();
-        if (cursor.moveToFirst()) {
-            //Recorremos el cursor hasta que no haya m�s registros
-            do {
-
-                oBibleRead.setIDLIBRO(cursor.getString(0));
-                oBook.setIdbook(cursor.getString(0));
-                oBook.setName(cursor.getString(1));
-                oBook.setAbrev(cursor.getString(2));
-                oVerse.setChapter(cursor.getString(4));
-                oVerse.setVerse(cursor.getString(5));
-                oVerse.setText(cursor.getString(6));
-                oVerse.setLanguage(cursor.getString(7));
-                oVerse.setHighlight(cursor.getString(8));
-                aBibleRead.add(oBibleRead);
-                aBook.add(oBook);
-                aVerse.add(oVerse);
-
-                oBibleRead = new M_BIBLE_READ();
-                oBook = new M_BOOK();
-                oVerse = new M_VERSE();
-
-            } while(cursor.moveToNext());
-        }
-
-        Lista.add(aBibleRead);
-//		Lista.add(oMapeo);
-        Lista.add(aBook);
-        Lista.add(aVerse);
-*/
-        return Lista;
+            }
+        });
+        t.start();
+        return result;
     }
 
     public List<Object> PlanLectura(Context context, String language)
     {
         List<M_BIBLE_READ> aBibleRead= new  ArrayList<M_BIBLE_READ>();
         List<M_BOOK> aBook = new ArrayList<M_BOOK>();
-
-
         M_BIBLE_READ oBibleRead = new M_BIBLE_READ();
         M_BOOK oBook = new M_BOOK();
-
-
         List<Object> Lista = new ArrayList<Object>();
-
-
 
         return Lista;
     }
@@ -121,11 +165,9 @@ public class C_LOGICA {
 
     public List<Object> LecturaEGW(Context context, String language, String date)
     {
-
-
         List<Object> Lista = new ArrayList<Object>();
-
 
         return Lista;
     }
 }
+

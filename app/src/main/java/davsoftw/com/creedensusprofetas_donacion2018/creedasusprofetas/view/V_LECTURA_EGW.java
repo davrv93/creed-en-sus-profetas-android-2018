@@ -48,7 +48,7 @@ public class V_LECTURA_EGW extends Activity {
       System.out.println("DATE: "+date);
       
       LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.r_fila6);
-      List<Object> Lista =oMapeo.mappingList(this, 2, Integer.valueOf(language),date);
+      /*List<Object> Lista =oMapeo.mappingList(this, 2, Integer.valueOf(language),date);
 	  List<M_BOOK_EGW> aBookEgw = new ArrayList<M_BOOK_EGW>();
 	  List<M_BOOK_READ_EGW> aBookReadEgw = new ArrayList<M_BOOK_READ_EGW>();
 	  List<M_CHAPTER_EGW> aChapter = new ArrayList<M_CHAPTER_EGW>();
@@ -77,6 +77,7 @@ public class V_LECTURA_EGW extends Activity {
       myLinearLayout.addView(rowTextView);      
       myTextViews[i] = rowTextView;
       }
+      */
       
       
       
