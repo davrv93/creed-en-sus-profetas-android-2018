@@ -1,10 +1,7 @@
 package davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.view;
 
-//import android.support.v7.app.ActionBarActivity;
-import java.security.acl.Owner;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,12 +18,21 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.CalendarView;
-import android.widget.CalendarView.OnDateChangeListener;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import davsoftw.com.creedensusprofetas_donacion2018.R;
 import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.controller.C_MAPEO;
@@ -35,165 +41,171 @@ import davsoftw.com.creedensusprofetas_donacion2018.creedasusprofetas.model.M_VE
 
 public class V_LECTURA_BIBLIA extends Activity {
 
-	public C_MAPEO oMapeo;
-	public TextView[] myTextViews;
-	public LinearLayout Layout;
-	public String idbook;
-	public String chapter;
-	public String verse;
-	public String highlight;
-	public String date;
+    public C_MAPEO oMapeo;
+    public TextView[] myTextViews;
+    public LinearLayout Layout;
+    public String idbook;
+    public String chapter;
+    public String verse;
+    public String highlight;
+    public String date;
+    public JSONArray jsonArray;
+    public JSONObject headerObject;
 
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// Asignando vista
-		setContentView(R.layout.lay_v_lectura);
-		oMapeo = new C_MAPEO();
-		SharedPreferences prefs = getSharedPreferences("MisPreferencias",
-				Context.MODE_PRIVATE);
-		String language = prefs.getString("language", "");
-		System.out.pritln("language"+language);
-		Intent myIntent = getIntent(); // gets the previously created intent
-		date = myIntent.getStringExtra("date");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Asignando vista
+        setContentView(R.layout.lay_v_lectura);
+        oMapeo = new C_MAPEO();
+        SharedPreferences prefs = getSharedPreferences("MisPreferencias",
+                Context.MODE_PRIVATE);
+        String language = prefs.getString("language", "");
+        System.out.print("language" + language);
+        Intent myIntent = getIntent(); // gets the previously created intent
+        date = myIntent.getStringExtra("date");
 
-		// Instantiate the RequestQueue.
-		RequestQueue queue = Volley.newRequestQueue(this);
-		String url ="https://davrv93.pythonanywhere.com/api/believe/verse/reading/";
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = sdf.format(c.getTime());
 
-		// Request a string response from the provided URL.
-		StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-				new Response.Listener<String>() {
-					@Override
-					public void onResponse(String response) {
-						// Display the first 500 characters of the response string.
-						mTextView.setText("Response is: "+ response.substring(0,500));
-					}
-				}, new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				mTextView.setText("That didn't work!");
-			}
-		});
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final TextView Titulo = new TextView(this);
 
-		// Add the request to the RequestQueue.
-		queue.add(stringRequest);
+        final String url = "https://davrv93.pythonanywhere.com/api/believe/verse/reading/?date=" + strDate + "&language=ES";
 
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-		System.out.println("DATE: " + date);
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-		LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.r_fila6);
-		/*
-		List<Object> Lista = oMapeo.mappingList(this, 1,
-				Integer.valueOf(language), date);
-		List<M_VERSE> aVerse = new ArrayList<M_VERSE>();
-		List<M_BOOK> aBook = new ArrayList<M_BOOK>();
+                        try {
+                            jsonArray = response.getJSONArray("obj_reading");
 
-		aVerse = (List<M_VERSE>) Lista.get(2);
-		aBook = (List<M_BOOK>) Lista.get(1);
+                            headerObject = response.getJSONObject("obj_header");
 
-		int N = aVerse.size();
-		myTextViews = new TextView[N];
-		final TextView Titulo = new TextView(this);
-		Titulo.setText(aBook.get(0).getName() + " "
-				+ aVerse.get(0).getChapter());
-		Titulo.setTypeface(null, Typeface.BOLD);
-		Titulo.setGravity(Gravity.CENTER);
-		Titulo.setTextSize(24);
-		Titulo.setTextColor(Color.WHITE);
-		Titulo.setBackgroundColor(Color.parseColor("#000000"));
+                            int N = jsonArray.length();
+                            LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.r_fila6);
 
-		myLinearLayout.addView(Titulo);
+                            myTextViews = new TextView[N];
 
-		for (int i = 0; i < N; i++) {
-			final TextView rowTextView = new TextView(this);
-			rowTextView.setTextSize(24);
-			rowTextView.setText(aVerse.get(i).getVerse() + " "
-					+ aVerse.get(i).getText() + '\n');
-			rowTextView.setTextColor(Color.WHITE);
-			rowTextView.setTypeface(null, Typeface.ITALIC);
-			rowTextView.setId(i + 1);
-			myLinearLayout.addView(rowTextView);
-			rowTextView.setBackgroundColor(Color.parseColor("#000000"));
+                            try {
+                                Titulo.setText(headerObject.getString("book_name"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            Titulo.setTypeface(null, Typeface.BOLD);
+                            Titulo.setGravity(Gravity.CENTER);
+                            Titulo.setTextSize(24);
+                            Titulo.setTextColor(Color.WHITE);
+                            Titulo.setBackgroundColor(Color.parseColor("#000000"));
 
-			final String verse = aVerse.get(i).getVerse();
-			final String idbook = aBook.get(0).getIdbook();
-			final String chapter = aVerse.get(0).getChapter();
-			final String highlight = aVerse.get(i).getHighlight();
+                            myLinearLayout.addView(Titulo);
 
-			if (highlight.compareTo("1") == 0) {
-				rowTextView.setBackgroundColor(Color.BLUE);
-				System.out.println("blue");
-			}
 
-			rowTextView.setOnTouchListener(new OnTouchListener() {
-				private GestureDetector gestureDetector = new GestureDetector(
-						V_LECTURA_BIBLIA.this,
-						new GestureDetector.SimpleOnGestureListener() {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                final TextView rowTextView = new TextView(getApplicationContext());
+                                JSONObject versiculo = jsonArray.getJSONObject(i);
+                                rowTextView.setTextSize(24);
+                                rowTextView.setText(versiculo.getString("verse") + " "
+                                        + versiculo.getString("data") + '\n');
+                                rowTextView.setTextColor(Color.WHITE);
+                                rowTextView.setTypeface(null, Typeface.ITALIC);
+                                rowTextView.setId(i + 1);
+                                myLinearLayout.addView(rowTextView);
+                                rowTextView.setBackgroundColor(Color.parseColor("#000000"));
 
-							public boolean onDoubleTap(MotionEvent e) {
+                                if (versiculo.getString("highlight").compareTo("1") == 0) {
+                                    rowTextView.setBackgroundColor(Color.BLUE);
+                                    System.out.println("blue");
+                                }
 
-								int colorId = ((ColorDrawable) rowTextView
-										.getBackground()).getColor();
+                                rowTextView.setOnTouchListener(new OnTouchListener() {
+                                    private GestureDetector gestureDetector = new GestureDetector(
+                                            V_LECTURA_BIBLIA.this,
+                                            new GestureDetector.SimpleOnGestureListener() {
 
-								if (colorId == Color.BLUE) {
-									rowTextView.setBackgroundColor(Color.BLACK);
-									oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
-											1, idbook, chapter, verse, "2");
-								} else {
-									rowTextView.setBackgroundColor(Color.BLUE);
-									oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
-											1, idbook, chapter, verse, "1");
-								}
+                                                public boolean onDoubleTap(MotionEvent e) {
 
-								return super.onDoubleTap(e);
-							}
+                                                    int colorId = ((ColorDrawable) rowTextView
+                                                            .getBackground()).getColor();
 
-							@Override
-							public boolean onSingleTapConfirmed(MotionEvent e) {
-								// TODO Auto-generated method stub
-								// rowTextView.setBackgroundColor(Color.parseColor("8258FA"));
+                                                    if (colorId == Color.BLUE) {
+                                                        rowTextView.setBackgroundColor(Color.BLACK);
+                                                        oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
+                                                                1, idbook, chapter, verse, "2");
+                                                    } else {
+                                                        rowTextView.setBackgroundColor(Color.BLUE);
+                                                        oMapeo.mappingVerse(V_LECTURA_BIBLIA.this,
+                                                                1, idbook, chapter, verse, "1");
+                                                    }
 
-								return super.onSingleTapConfirmed(e);
-							}
-						});
+                                                    return super.onDoubleTap(e);
+                                                }
 
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					gestureDetector.onTouchEvent(event);
+                                                @Override
+                                                public boolean onSingleTapConfirmed(MotionEvent e) {
+                                                    // TODO Auto-generated method stub
+                                                    // rowTextView.setBackgroundColor(Color.parseColor("8258FA"));
 
-					return true;
-				}
-			});
-			myTextViews[i] = rowTextView;
-		}
+                                                    return super.onSingleTapConfirmed(e);
+                                                }
+                                            });
 
-		// ImageView im = (ImageView) findViewById(R.id.btnCheck);
-		// im.setBackgroundColor(Color.parseColor("#000000"));
-		*/
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent event) {
+                                        gestureDetector.onTouchEvent(event);
 
-	}
+                                        return true;
+                                    }
+                                });
+                                myTextViews[i] = rowTextView;
 
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.btnVolver1:
-			finish();
-			break;
 
-		}
-	}
+                            }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+
+                    }
+                });
+
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+
+    }
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnVolver1:
+                finish();
+                break;
+
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
